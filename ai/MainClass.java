@@ -9,18 +9,45 @@ import java.io.IOException;
 import org.json.JSONObject;
 
 import ai.GeneticAlgorithm.GeneticAlgorithm;
-import ai.poem.Template_5_8_1;
 import ai.word.WordPile;
 
 public class MainClass {
 	
 	public static void main(String[] args){
+		
+		/*Point[] array1 = new Point[2];
+		Point[] array2 = new Point[2];
+		
+		array1[0] = new Point("AAA", 1, 2);
+		array1[1] = new Point("BBB", 5, 15);
+
+		for (int i = 0 ; i < array1.length ; i++)
+			array2[i] = array1[i];
+		
+		for (Point p : array1)
+			System.out.println(p.toString());
+		for (Point p : array2)
+			System.out.println(p.toString());
+		System.out.println();
+		
+		array1[0] = new Point(array2[1].name, array2[1].xy.getX(), array2[1].xy.getY());
+		array1[1] = new Point(array2[1].name, array2[1].xy.getX(), array2[1].xy.getY());
+		for (Point p : array1)
+			System.out.println(p.toString());
+		for (Point p : array2)
+			System.out.println(p.toString());
+		System.out.println();
+		
+		array1[0].name = new String("GG");
+		for (Point p : array1)
+			System.out.println(p.toString());
+		for (Point p : array2)
+			System.out.println(p.toString());*/
+		
 		JSONObject json = new JSONObject(ReadFile("wordPile.json"));
 		WordPile wordPile = new WordPile(json);
 		//WriteToFile("wordPile.txt",wordPile.toString());
-		System.out.println("Done");
-		int[][] wordComposition =  new int[][]{{2,2,1},{2,2,1},{2,3},{2,3},{2,2,1},{2,2,1},{2,2,1},{2,2,1}};
-		new GeneticAlgorithm(wordPile, new Template_5_8_1(wordComposition)).Evole();
+		new GeneticAlgorithm(8, 5, wordPile).Evole();
 	}
 	
 	public static String ReadFile(String fileName){
@@ -56,5 +83,35 @@ public class MainClass {
 			e.printStackTrace();
 		}
 		
+	}
+}
+
+class Point{
+	XY xy;
+	String name;
+	
+	public Point(String name, int x, int y) {
+		this.name = name;
+		this.xy = new XY(x,y);
+	}
+	
+	public String toString(){
+		return name+"("+xy.getX()+","+xy.getY()+")";
+	}
+}
+
+class XY{
+	int x,y;
+	public XY(int x,int y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	public int getX(){
+		return this.x;
+	}
+	
+	public int getY(){
+		return this.y;
 	}
 }
