@@ -22,7 +22,7 @@ public class HtmlReader {
 	 *	查詢「風」時，第一個結果是「八面威風」，所以還必須從較長的單字中取出欲查詢的詞和對應的注音
 	 *	注意：html原始碼中有的空白是"全形"空白
 	 */
-	public static String[] GetBopomofo(String target) throws BopomofoException{
+	 static String[] GetBopomofo(String target) throws BopomofoException{
 		final int buffferSize = 4096;
 
 		String data = new String();

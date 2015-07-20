@@ -1,17 +1,23 @@
-package general;
+package ai.GeneticAlgorithm;
 
 public class GenerationData {
 	
 	int[] max, min, average;
 	int maxValue,minValue;
 	
-	public GenerationData(int countPoint,int[] max, int[] min, int[] average, int maxValue, int minValue){
+	public GenerationData(int countPoint,int[] max, int[] min, int[] average){
 
 		this.max = new int[countPoint];
 		this.min = new int[countPoint];
 		this.average = new int[countPoint];
-		this.maxValue = maxValue;
-		this.minValue = minValue;
+		maxValue = 0;
+		minValue = 1000000;
+		for ( int i = 0 ; i < countPoint ; i++){
+			if ( maxValue < max[i])
+				maxValue = max[i];
+			if (minValue > min[i])
+				minValue = min[i];
+		}
 		
 		for (int i = 0 ; i < countPoint ; i++){
 			this.max[i] = max[i];

@@ -1,4 +1,4 @@
-package general;
+package ai.GeneticAlgorithm;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -9,7 +9,7 @@ import java.awt.Stroke;
 
 import javax.swing.*;
 
-public class Windows extends JFrame{
+public class StatisticWindow extends JFrame{
 	
 	/**
 	 * 
@@ -19,23 +19,12 @@ public class Windows extends JFrame{
 	MyPanel panel;
 	GenerationData dataSet;
 	
-	public static void main(String[] args){
-		int maxValue = 10;
-		int minValue = 0;
-		int[] max = new int[]{3,4,5,6,5,4,3,2,1,1,1,1,1,1,1};
-		int[] min = new int[]{1,2,3,4,5,6,7,8,9,10,10,10,10};
-		int[] avg = new int[]{7,3,2,1,6,9,5,4,2,8,8,8,8,8,8,8};
-		
-		new Windows(new GenerationData(13, max, min, avg, maxValue,minValue));
-	}
-	
-	
-	public Windows(GenerationData dataSet){
+	public StatisticWindow(GenerationData dataSet){
 		this.dataSet = dataSet;
 		
 		this.setTitle("統計畫面");
 		this.setLayout(null);
-		this.setBounds(0,0,800,600);
+		this.setBounds(0,0,1320,650);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		panel = new MyPanel();
@@ -50,8 +39,8 @@ public class Windows extends JFrame{
 		 * 
 		 */
 		private static final int offset = 30;
-		private static final int width = 700;
-		private static final int height = 500;
+		private static final int width = 1300;
+		private static final int height = 600;
 		private double unitX, unitY;
 		private int maxValue = dataSet.getMaxValue();
 		private int minValue = dataSet.getMinValue();
@@ -106,13 +95,13 @@ public class Windows extends JFrame{
 		}
 		
 		private void DrawXScale(Graphics g, int index){
-			int x = (int)(index*unitX);
+			int x = offset+(int)(index*unitX);
 			g.drawString(String.valueOf(index),x, height - offset+15);
 			g.drawLine(x, height - offset + 5, x, offset);
 		}
 		
 		private void DrawScale(Graphics g, int scale){
-			int y = (height-offset-1)-(int)((scale-minValue+1)*unitY);
+			int y = (height-offset-1)-(int)((scale-minValue+1)*unitY) - offset;
 			g.drawString(String.valueOf(scale),5,y);
 			g.drawLine(offset-5, y, width - offset, y);
 		}
@@ -123,8 +112,8 @@ public class Windows extends JFrame{
 			
 			for (int i = 0 ; i < countPoint ; i++){
 				g.setColor(color);
-				x = (int)((i+1)*unitX);
-				y = (int)((height-offset-1)-(data[i]-minValue+1)*unitY);
+				x = offset+(int)((i+1)*unitX);
+				y = (int)((height-offset-1)-(data[i]-minValue+1)*unitY) - offset;
 				if ( i > 0){
 					/*((Graphics2D)g).setStroke(new BasicStroke(3.0f));*/
 					g.drawLine(preX, preY, x, y);

@@ -1,5 +1,10 @@
 package ai.net;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,6 +20,9 @@ import ai.exception.BopomofoException;
 import ai.word.ChineseWord;
 
 public class JSONReader {
+	public enum SOURCE{
+		file,conceptNet
+	}
 	/**
 	 * 	利用concept net的API尋找和某個主題相關的詞，並且利用rel來推測詞的詞性
 	 * 	@param  topic: 某個主題(String)
@@ -26,19 +34,25 @@ public class JSONReader {
 	 * 
 	 * 	處理json的library要另外去下載，請參考 http://www.ewdna.com/2008/10/jsonjar.html
 	 */
-	public static ChineseWord[] GetWordList(String topic){
-		final int limit = 500;
+	public static ChineseWord[] GetWordList(String topic,SOURCE source){
+		final int limit = 1000;
 		ChineseWord[] tempWordList = new ChineseWord[limit];
 		int wordType,count = 0;
 		
 		try {
 			String word,startOrEnd;
-			String url = new String("http://conceptnet5.media.mit.edu/data/5.2/search?limit="+limit+"&nodes=/c/zh_TW/"+URLEncoder.encode(topic,"UTF-8"));
 			//String url = new String("http://conceptnet5.media.mit.edu/data/5.3/c/zh/"+URLEncoder.encode(topic,"UTF-8")+"?limit="+limit);
-			System.out.println(url);
-			JSONObject obj = JSONReader.ReadJsonFromURL(url), jsonObj;
+			JSONObject obj, jsonObj;
+			
+			if (source == SOURCE.conceptNet){
+				String url = new String("http://conceptnet5.media.mit.edu/data/5.2/search?limit="+limit+"&nodes=/c/zh_TW/"+URLEncoder.encode(topic,"UTF-8"));
+				System.out.println(url);
+				obj = ReadJsonFromURL(url);
+			}
+			else{
+				obj = ReadJsonFromFile("json.txt");
+			}
 			JSONArray array = obj.getJSONArray("edges");
-			 
 			for (Object item : array){
 				jsonObj  = ((JSONObject)item);
 				if (jsonObj.get("start").toString().indexOf(topic) != -1){
@@ -83,7 +97,7 @@ public class JSONReader {
 	 * 	@param  url: json檔案的url (String)
 	 * 	@return JSONObject
 	 */
-	public static JSONObject ReadJsonFromURL(String url){
+	private static JSONObject ReadJsonFromURL(String url){
 		JSONObject json = null;
 		InputStream is = null;
 		try {
@@ -94,7 +108,17 @@ public class JSONReader {
 			while( (c = reader.read()) != -1){
 				strBuilder.append((char)c);
 			}
-			json = new JSONObject(strBuilder.toString());
+			String jsonStr = strBuilder.toString();
+			json = new JSONObject(jsonStr);
+			try {
+				FileOutputStream fout = new FileOutputStream("json.txt");
+				BufferedOutputStream bufferFout = new BufferedOutputStream(fout);
+				bufferFout.write(jsonStr.getBytes());
+				fout.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -112,6 +136,26 @@ public class JSONReader {
 		return json;
 	}
 	
+	private static JSONObject ReadJsonFromFile(String fileName) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			FileInputStream fin = new FileInputStream(fileName);
+			BufferedInputStream inStream = new BufferedInputStream(fin);
+			byte[] buff = new byte[4096];
+			int count;
+			while ((count = inStream.read(buff)) != -1){
+				sb.append(new String(buff, 0, count));
+			}
+			inStream.close();
+			fin.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return new JSONObject(sb.toString());
+	}
+	
 	/**
 	 * 	利用relation推測詞的詞性
 	 * 	@param relation: concept net 上定義的 relation
@@ -120,7 +164,7 @@ public class JSONReader {
 	 *  
 	 *  如果遇到未知的 relation 則會回傳 0，表示沒有任何詞性
 	 */
-	public static int GetWordType(String relation, String startOrEnd){
+	private static int GetWordType(String relation, String startOrEnd){
 		final String[] rel = new String[] {"/r/RelatedTo","/r/IsA","/r/PartOf","/r/HasA","/r/UsedFor","/r/CapableOf","/r/AtLocation","/r/Causes","/r/HasSubevent","/r/HasFirstSubevent","/r/HasPrerequisite","/r/HasProperty","/r/MotivatedByGoal","/r/Desires","/r/CreatedBy","/r/Synonym","/r/Antonym","/r/DerivedFrom","/r/MadeOf"};
 		final String[] start = new String[] {"名形動","名","名","名","名","名","名","名動","動","動","動","名","動","名","名","名","名","名","名"};
 		final String[] end = new String[] {"名形動","名","名","名","動","動","名","形動","動","動","動","形","名形動","名動","名","名","名","名","名"};
