@@ -7,9 +7,10 @@ import ai.word.ChineseWord;
 public class PoemTemplate implements Comparable<PoemTemplate>{
 	
 	private static final boolean DEBUG = false;
-	private final static int scoreRhyme = 400;
-	private final static int scoreTone = 300;
-	private final static int scoreAntithesis = 100;
+	public final static int scoreRhyme = 200;
+	public final static int scoreTone = 200;
+	public final static int scoreAntithesis = 100;
+	public final static int  scoreDiversity = 100;
 	
 	private int col, row;
 	private int[][] wordComposition;
@@ -80,7 +81,23 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 	}
 	
 	private void FitnessFunction(){
-		fitnessScore = GetRhythmScore()+GetToneScore()+GetAntithesisScore();
+		fitnessScore = GetRhythmScore()+GetToneScore()+GetAntithesisScore()+GetDiversityScore();
+	}
+	
+	private int GetDiversityScore(){
+		int countUniqueChar = 0;
+		HashMap<Character, Boolean> map = new HashMap<Character, Boolean>();
+		char c;
+		for (int i = 1 ; i <= row*col ; i++){
+			c = GetCharAt(i);
+			if (!map.containsKey(c)){
+				countUniqueChar += 1;
+				map.put(c, true);
+			}
+		}
+		
+		if (DEBUG) System.out.printf("不重複的字共有 %d / %d 個\n",countUniqueChar,row*col);
+		return scoreDiversity*countUniqueChar/(row*col);
 	}
 	
 	private int GetAntithesisScore(){
@@ -103,7 +120,7 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 		int countMatchTone = 0;
 		int countMatchRhythmTone = 0;
 		int index;
-		if (GetToneAt(2, poem) == 0){
+		if (GetToneAt(2) == 0){
 			index = 0;  /*平起式*/
 		}
 		else{
@@ -114,8 +131,8 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 		for ( int i = 0 ; i < row ; i ++){
 			for ( int j = 2, k = 0 ; j <= col ; j+=2, k++){
 				int charIndex = i*col+j;
-				if (DEBUG) System.out.printf("%c(%d)",GetCharAt(charIndex, poem),GetToneAt(charIndex, poem));
-				if (GetToneAt(charIndex, poem) == standardTone[index][k]){
+				if (DEBUG) System.out.printf("%c(%d)",GetCharAt(charIndex),GetToneAt(charIndex));
+				if (GetToneAt(charIndex) == standardTone[index][k]){
 					countMatchTone += 1;
 					if (DEBUG) System.out.print("O ");
 				}
@@ -129,27 +146,27 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 		/*處理韻腳的平仄*/
 		if (DEBUG) System.out.println("===韻腳平仄===");
 		if (poem[0][wordComposition[0].length-1].GetRythm() == poem[1][wordComposition[1].length-1].GetRythm()){
-			if (GetToneAt(1*col, poem) == 0){
+			if (GetToneAt(1*col) == 0){
 				countMatchRhythmTone += 1; /*首句押韻用平聲*/
-				if (DEBUG) System.out.println("第1句 : 平");
+				if (DEBUG) System.out.printf("第1句 : 平 (%c,%c)\n",GetCharAt(col),GetCharAt(2*col));
 			}
 		}
 		else{
-			if (GetToneAt(1*col, poem) == 1){
+			if (GetToneAt(1*col) == 1){
 				countMatchRhythmTone += 1; /*首句不押韻用仄聲*/
 				if (DEBUG) System.out.println("第1句 : 仄");
 			}
 		}
-		if (GetToneAt(2*col, poem) == 0){
+		if (GetToneAt(2*col) == 0){
 			countMatchRhythmTone += 1;
 			if (DEBUG) System.out.println("第2句 : 平");
 		}
 		for (int i = 4 ; i <= row ; i += 2){
-			if ( GetToneAt((i-1)*col, poem) == 1){
+			if ( GetToneAt((i-1)*col) == 1){
 				countMatchRhythmTone += 1;
 				if (DEBUG) System.out.println("第"+(i-1)+"句 : 仄");
 			}
-			if ( GetToneAt(i*col, poem) == 0){
+			if ( GetToneAt(i*col) == 0){
 				countMatchRhythmTone += 1;
 				if (DEBUG) System.out.println("第"+i+"句 : 平");
 			}
@@ -157,10 +174,18 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 		if (DEBUG)System.out.printf(">>符合平仄的字有 (%d + %d(韻腳相關)) / %d 個\n",countMatchTone,countMatchRhythmTone,maxToneMatch);
 		return (countMatchTone+countMatchRhythmTone)*scoreTone/maxToneMatch;
 	}
-	
-	private char GetCharAt(int index, ChineseWord[][] poem){
+	/**
+	 * 取得整首詩中的某個字
+	 * @param index 從"1"開始算
+	 * @return 
+	 */
+	private char GetCharAt(int index){
 		if ( index > row*col){
 			System.err.println("error : index out of bound");
+			System.exit(1);
+		}
+		if (index <=0){
+			System.err.println("error : Index 從 1 開始算");
 			System.exit(1);
 		}
 		index -= 1;
@@ -176,10 +201,18 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 		}
 		return '?';
 	}
-	
-	private int GetToneAt(int index, ChineseWord[][] poem){
+	/**
+	 * 取得整首詩中某個字的平仄
+	 * @param index 從 "1" 開始算
+	 * @return 0:平, 1:仄
+	 */
+	private int GetToneAt(int index){
 		if ( index > row*col){
 			System.err.println("error : index out of bound");
+			System.exit(1);
+		}
+		if (index <=0){
+			System.err.println("error : Index 從 1 開始算");
 			System.exit(1);
 		}
 		index -= 1;

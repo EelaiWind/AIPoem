@@ -31,7 +31,7 @@ public class GeneticAlgorithm {
 	
 	/*終止條件*/
 	private final int maxGeneration = 400;
-	private final int targetScore = 1000000;
+	private final int targetScore = PoemTemplate.scoreAntithesis + PoemTemplate.scoreDiversity + PoemTemplate.scoreTone + PoemTemplate.scoreRhyme;
 	
 	private int row, col;
 	
