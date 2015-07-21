@@ -72,6 +72,7 @@ public class WordPile {
 	}
 	
 	private void ClassifyWords(){
+		System.out.printf("===詞庫中總共有%d個詞===\n",wordList.length);
 		for (ChineseWord word : wordList){
 			/*一個詞可能會有很多詞性*/
 			if ( (word.getWordType() & ChineseWord.noun) > 0){

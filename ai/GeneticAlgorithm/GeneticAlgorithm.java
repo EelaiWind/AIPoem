@@ -75,6 +75,7 @@ public class GeneticAlgorithm {
 			if (maxScore[i] >= targetScore)
 				break;
     	}
+    	PrintPoem();
     	if (counPoint > 0)
     		new StatisticWindow(new GenerationData(counPoint, maxScore, minScore, avgScore));
 	}
@@ -141,35 +142,38 @@ public class GeneticAlgorithm {
 		int[] cumulativeSum = new int[populationSize];
 		
 		int totalSum = 0;
+		int head = populationSize/10,tail = head, middle = populationSize - head - tail;
 		
-		//Arrays.sort(population);
+		Arrays.sort(population);
+		
 		PoemTemplate[] populationCopy = new PoemTemplate[populationSize];
 		for (int i = 0 ; i < populationSize ; i++){
-			populationCopy[i] = population[i];
-			 
+			populationCopy[i] = population[i];	 
 		}
-		if (DEBUG){
-			PrintPoem();
-		}
-		for ( int i = 0 ; i < populationSize ; i++){
+		
+		for ( int i = 0 ; i < middle ; i++){
 			if (i ==0)
-				cumulativeSum[i] = population[i].getFitnessScore();
+				cumulativeSum[i] = population[i+head].getFitnessScore();
 			else
-				cumulativeSum[i] = cumulativeSum[i-1] + population[i].getFitnessScore();
+				cumulativeSum[i] = cumulativeSum[i-1] + population[i+head].getFitnessScore();
 		}
-		totalSum = cumulativeSum[populationSize-1];
+		totalSum = cumulativeSum[middle-1];
 		
 		if (DEBUG)  System.out.println("===Select===");
 		
-		for (int i = 0 ; i < populationSize ; i++){
+		for (int i = 0 ; i < middle ; i++){
 			int nextIndex = rand.nextInt(totalSum)+1;
-			for ( int j = 0 ;j< populationSize ; j++){
+			for ( int j = 0 ;j< middle ; j++){
 				if ( cumulativeSum[j] >= nextIndex){
-					if (DEBUG)  System.out.println("第  "+i+" 次；選到第 "+i+" 首");
-					population[i] = new PoemTemplate(row, col, populationCopy[j].getTeplate(), populationCopy[j].getPoem());
+					if (DEBUG)  System.out.println("第  "+(head+i)+" 次；選到第 "+(head+j)+" 首");
+					population[head+i] = new PoemTemplate(row, col, populationCopy[j].getTeplate(), populationCopy[j].getPoem());
 					break;
 				}
 			}
+		}
+		
+		for ( int i = 0 ; i < tail ; i++){
+			population[populationSize-1-i] = RandomPoem(row, col);
 		}
 		
 	}

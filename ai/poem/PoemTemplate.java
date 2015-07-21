@@ -7,8 +7,8 @@ import ai.word.ChineseWord;
 public class PoemTemplate implements Comparable<PoemTemplate>{
 	
 	private static final boolean DEBUG = false;
-	private final static int scoreRhyme = 500;
-	private final static int scoreTone = 100;
+	private final static int scoreRhyme = 400;
+	private final static int scoreTone = 300;
 	private final static int scoreAntithesis = 100;
 	
 	private int col, row;
@@ -17,7 +17,6 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 	private int fitnessScore;
 	private boolean modified;
 	private int maxRhythmMatch, maxToneMatch, maxAntithesisMatch;
-	
 	/**
 	 * 創建一首新的詩，每首詩可以有不同的模板
 	 * <注意>因為poem中的詞語在基因演算法中會被替換，所以每個PoemTemplate都要有一個poem的實體，
@@ -28,6 +27,7 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 	 * @param wordComposition
 	 * @param poem 
 	 */
+	
 	public PoemTemplate(int row,int col,int[][] wordComposition, ChineseWord[][] poem){
 		this.row = row;
 		this.col = col;
@@ -53,8 +53,8 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 			maxAntithesisMatch += wordComposition[i].length;
 		}
 		
-		FitnessFunction();
-		modified = false;
+		modified = true;
+		getFitnessScore();
 	}
 	
 	public ChineseWord[][] getPoem() {
@@ -80,7 +80,7 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 	}
 	
 	private void FitnessFunction(){
-		 fitnessScore = GetRhythmScore()+GetToneScore()+GetAntithesisScore();
+		fitnessScore = GetRhythmScore()+GetToneScore()+GetAntithesisScore();
 	}
 	
 	private int GetAntithesisScore(){
@@ -232,10 +232,11 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 
 	@Override
 	public int compareTo(PoemTemplate other) {
-		// TODO Auto-generated method stub
-		if (this.fitnessScore > other.getFitnessScore())
+		int score1 = this.getFitnessScore();
+		int score2 = other.getFitnessScore();
+		if (score1 > score2)
 			return -1;
-		else if (this.fitnessScore < other.getFitnessScore())
+		else if (score1 < score2)
 			return 1;
 		else {
 			return 0;

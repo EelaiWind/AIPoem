@@ -24,7 +24,7 @@ public class StatisticWindow extends JFrame{
 		
 		this.setTitle("統計畫面");
 		this.setLayout(null);
-		this.setBounds(0,0,1320,650);
+		this.setBounds(0,0,1320,730);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		panel = new MyPanel();
@@ -40,7 +40,7 @@ public class StatisticWindow extends JFrame{
 		 */
 		private static final int offset = 30;
 		private static final int width = 1300;
-		private static final int height = 600;
+		private static final int height = 700;
 		private double unitX, unitY;
 		private int maxValue = dataSet.getMaxValue();
 		private int minValue = dataSet.getMinValue();
@@ -61,7 +61,7 @@ public class StatisticWindow extends JFrame{
 			super.paintComponent(g);
 			
 			unitX = (width - 2 * offset) / (countPoint);
-			unitY = (height - 2 * offset) / (maxValue - minValue + 2);
+			unitY = (height - 2 * offset) / (maxValue - minValue+1);
 			
 			/*畫X,Y軸*/
 			((Graphics2D)g).setStroke(new BasicStroke(3));
@@ -101,7 +101,7 @@ public class StatisticWindow extends JFrame{
 		}
 		
 		private void DrawScale(Graphics g, int scale){
-			int y = (height-offset-1)-(int)((scale-minValue+1)*unitY) - offset;
+			int y = (int)(height-offset-(scale-minValue+1)*unitY);
 			g.drawString(String.valueOf(scale),5,y);
 			g.drawLine(offset-5, y, width - offset, y);
 		}
@@ -113,7 +113,7 @@ public class StatisticWindow extends JFrame{
 			for (int i = 0 ; i < countPoint ; i++){
 				g.setColor(color);
 				x = offset+(int)((i+1)*unitX);
-				y = (int)((height-offset-1)-(data[i]-minValue+1)*unitY) - offset;
+				y = (int)(height-offset-(data[i]-minValue+1)*unitY);
 				if ( i > 0){
 					/*((Graphics2D)g).setStroke(new BasicStroke(3.0f));*/
 					g.drawLine(preX, preY, x, y);

@@ -1,9 +1,7 @@
 package ai.net;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,9 +18,7 @@ import ai.exception.BopomofoException;
 import ai.word.ChineseWord;
 
 public class JSONReader {
-	public enum SOURCE{
-		file,conceptNet
-	}
+	
 	/**
 	 * 	利用concept net的API尋找和某個主題相關的詞，並且利用rel來推測詞的詞性
 	 * 	@param  topic: 某個主題(String)
@@ -34,7 +30,7 @@ public class JSONReader {
 	 * 
 	 * 	處理json的library要另外去下載，請參考 http://www.ewdna.com/2008/10/jsonjar.html
 	 */
-	public static ChineseWord[] GetWordList(String topic,SOURCE source){
+	public static ChineseWord[] GetWordList(String topic){
 		final int limit = 1000;
 		ChineseWord[] tempWordList = new ChineseWord[limit];
 		int wordType,count = 0;
@@ -44,14 +40,10 @@ public class JSONReader {
 			//String url = new String("http://conceptnet5.media.mit.edu/data/5.3/c/zh/"+URLEncoder.encode(topic,"UTF-8")+"?limit="+limit);
 			JSONObject obj, jsonObj;
 			
-			if (source == SOURCE.conceptNet){
-				String url = new String("http://conceptnet5.media.mit.edu/data/5.2/search?limit="+limit+"&nodes=/c/zh_TW/"+URLEncoder.encode(topic,"UTF-8"));
-				System.out.println(url);
-				obj = ReadJsonFromURL(url);
-			}
-			else{
-				obj = ReadJsonFromFile("json.txt");
-			}
+			String url = new String("http://conceptnet5.media.mit.edu/data/5.2/search?limit="+limit+"&nodes=/c/zh_TW/"+URLEncoder.encode(topic,"UTF-8"));
+			System.out.println(url);
+			obj = ReadJsonFromURL(url);
+			
 			JSONArray array = obj.getJSONArray("edges");
 			for (Object item : array){
 				jsonObj  = ((JSONObject)item);
@@ -134,26 +126,6 @@ public class JSONReader {
 			}
 		}
 		return json;
-	}
-	
-	private static JSONObject ReadJsonFromFile(String fileName) {
-		StringBuilder sb = new StringBuilder();
-		try {
-			FileInputStream fin = new FileInputStream(fileName);
-			BufferedInputStream inStream = new BufferedInputStream(fin);
-			byte[] buff = new byte[4096];
-			int count;
-			while ((count = inStream.read(buff)) != -1){
-				sb.append(new String(buff, 0, count));
-			}
-			inStream.close();
-			fin.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return new JSONObject(sb.toString());
 	}
 	
 	/**
