@@ -15,14 +15,32 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 	private int[][] wordComposition;
 	private ChineseWord[][] poem = null;
 	private int fitnessScore;
+	private boolean modified;
 	private int maxRhythmMatch, maxToneMatch, maxAntithesisMatch;
 	
+	/**
+	 * 創建一首新的詩，每首詩可以有不同的模板
+	 * <注意>因為poem中的詞語在基因演算法中會被替換，所以每個PoemTemplate都要有一個poem的實體，
+	 * 		不可以單純複製reference，否則修改某個PoemTemplate的poem的某個詞的時候會影響到其他人
+	 * 
+	 * @param row
+	 * @param col
+	 * @param wordComposition
+	 * @param poem 
+	 */
 	public PoemTemplate(int row,int col,int[][] wordComposition, ChineseWord[][] poem){
 		this.row = row;
 		this.col = col;
 		this.wordComposition = wordComposition;
-		this.poem = poem;
-		this.fitnessScore = 0;
+		/*錯誤的複製 : this.poem = poem;*/
+		this.poem = new ChineseWord[row][];
+		for ( int i = 0 ; i < row ; i++){
+			this.poem[i] = new ChineseWord[poem[i].length];
+			for ( int j = 0 ; j < poem[i].length ; j++){
+				this.poem[i][j] = poem[i][j];
+			}
+		}
+		
 		maxRhythmMatch = row/2;
 		if (col == 5){
 			maxToneMatch = 3*row;
@@ -34,13 +52,26 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 		for (int i = 0 ; i < row ; i+= 2){
 			maxAntithesisMatch += wordComposition[i].length;
 		}
+		
+		FitnessFunction();
+		modified = false;
 	}
 	
 	public ChineseWord[][] getPoem() {
+		modified = true;
 		return poem;
 	}
 	
+	/**
+	 * 當呼叫 getPoem() 系統會認為使用者更改過詩的內容，因此要重新計算 "適應分數"
+	 * 否則就直接回傳上次計算完的結果
+	 * @return 適應分數
+	 */
 	public int getFitnessScore() {
+		if (modified){
+			FitnessFunction();
+			modified = false;
+		}
 		return fitnessScore;
 	}
 
@@ -48,14 +79,8 @@ public class PoemTemplate implements Comparable<PoemTemplate>{
 		return wordComposition;
 	}
 	
-	public int FitnessFunction(){
-		
-		if (poem.length != wordComposition.length)
-			return 0;
-		
-		fitnessScore = GetRhythmScore()+GetToneScore()+GetAntithesisScore();
-		
-		return fitnessScore;
+	private void FitnessFunction(){
+		 fitnessScore = GetRhythmScore()+GetToneScore()+GetAntithesisScore();
 	}
 	
 	private int GetAntithesisScore(){

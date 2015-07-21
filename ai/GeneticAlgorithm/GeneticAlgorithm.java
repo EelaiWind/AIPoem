@@ -10,11 +10,11 @@ import ai.word.ChineseWord;
 import ai.word.WordPile;
 
 public class GeneticAlgorithm {
-	private static final boolean DEBUG = true ;
+	private static final boolean DEBUG = false ;
 	 private final static Random rand = new Random();
 	 
     /*族群大小*/
-    private static final int populationSize = 10;
+    private static final int populationSize = 100;
     /*交配機率*/
     private static final double crossoverRate = 0.5;
     /*突變機率*/
@@ -30,7 +30,7 @@ public class GeneticAlgorithm {
 	private ArrayList<Integer> indexList = new ArrayList<Integer>();
 	
 	/*終止條件*/
-	private final int maxGeneration = 100;
+	private final int maxGeneration = 400;
 	private final int targetScore = 1000000;
 	
 	private int row, col;
@@ -142,15 +142,11 @@ public class GeneticAlgorithm {
 		
 		int totalSum = 0;
 		
-		
-		for (int i = 0 ; i < populationSize ; i++){
-			population[i].FitnessFunction();
-		}
-		
 		//Arrays.sort(population);
 		PoemTemplate[] populationCopy = new PoemTemplate[populationSize];
 		for (int i = 0 ; i < populationSize ; i++){
 			populationCopy[i] = population[i];
+			 
 		}
 		if (DEBUG){
 			PrintPoem();
@@ -169,9 +165,8 @@ public class GeneticAlgorithm {
 			int nextIndex = rand.nextInt(totalSum)+1;
 			for ( int j = 0 ;j< populationSize ; j++){
 				if ( cumulativeSum[j] >= nextIndex){
-					if (DEBUG)  System.out.println("第  "+i+" 次；選到第 "+j+" 首");
+					if (DEBUG)  System.out.println("第  "+i+" 次；選到第 "+i+" 首");
 					population[i] = new PoemTemplate(row, col, populationCopy[j].getTeplate(), populationCopy[j].getPoem());
-					population[i].FitnessFunction();
 					break;
 				}
 			}
